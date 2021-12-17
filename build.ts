@@ -8,6 +8,9 @@ import { ExecException, execSync } from 'child_process'
 import { devDependencies } from './package.json'
 import { compilerOptions } from './tsconfig.json'
 
+/**
+ * 彩色文字
+ */
 class Color {
     private base(code: number, msg: string): string {
         return `\u001B[${code}m${msg}\u001B[39m`
@@ -33,6 +36,9 @@ class Color {
     }
 }
 
+/**
+ * 彩色日志
+ */
 class Logger {
     private color = new Color()
 
