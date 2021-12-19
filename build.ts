@@ -41,6 +41,18 @@ class Color {
  */
 class Logger {
     private color = new Color()
+    private addDate = false
+
+    constructor(addDate: boolean = false) {
+        this.addDate = addDate
+    }
+
+    private _time(): string {
+        if (this.addDate) {
+            return this.datetime()
+        }
+        return this.time()
+    }
 
     private datetime(): string {
         const now = new Date(Date.now())
@@ -75,7 +87,7 @@ class Logger {
     }
 
     info(...msgs: string[]) {
-        let msg = `${this.time()} [${this.color.green('INFO')}]:`
+        let msg = `${this._time()} [${this.color.green('INFO')}]:`
         msgs.forEach((v, i) => {
             msg += " " + v
         })
@@ -84,11 +96,11 @@ class Logger {
     }
 
     error(msg: Error | string) {
-        console.log(`${this.time()} [${this.color.red('ERROR')}]: ${msg}`)
+        console.log(`${this._time()} [${this.color.red('ERROR')}]: ${msg}`)
     }
 
     warn(msg: Error | string) {
-        console.log(`${this.time()} [${this.color.yellow('WARNING')}]: ${msg}`)
+        console.log(`${this._time()} [${this.color.yellow('WARNING')}]: ${msg}`)
     }
 }
 
