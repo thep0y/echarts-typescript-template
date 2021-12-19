@@ -45,13 +45,33 @@ class Logger {
     private datetime(): string {
         const now = new Date(Date.now())
 
-        return this.color.gray(`${now.getFullYear()}-${now.getMonth()}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds() < 10 ? '0' + now.getSeconds() : now.getSeconds()}`)
+        let mon: string | number = now.getMonth()
+        let date: string | number = now.getDate()
+        let hour: string | number = now.getHours()
+        let min: string | number = now.getMinutes()
+        let sec: string | number = now.getSeconds()
+        mon = mon < 10 ? '0' + mon : mon
+        date = date < 10 ? '0' + date : date
+        hour = hour < 10 ? '0' + hour : hour
+        min = min < 10 ? '0' + min : min
+        sec = sec < 10 ? '0' + sec : sec
+
+        return this.color.gray(`${now.getFullYear()}-${mon}-${date} ${hour}:${min}:${sec}`)
     }
 
     private time(): string {
         const now = new Date(Date.now())
 
-        return this.color.gray(`${now.getHours()}:${now.getMinutes()}:${now.getSeconds() < 10 ? '0' + now.getSeconds() : now.getSeconds()}.${now.getMilliseconds()}`)
+        let hour: string | number = now.getHours()
+        let min: string | number = now.getMinutes()
+        let sec: string | number = now.getSeconds()
+        let mils: string | number = now.getMilliseconds()
+        hour = hour < 10 ? '0' + hour : hour
+        min = min < 10 ? '0' + min : min
+        sec = sec < 10 ? '0' + sec : sec
+        mils = mils < 100 ? mils < 10 ? '00' + mils : "0" + mils : mils
+
+        return this.color.gray(`${hour}:${min}:${sec}.${mils}`)
     }
 
     info(...msgs: string[]) {
