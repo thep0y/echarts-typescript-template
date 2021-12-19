@@ -42,10 +42,16 @@ class Color {
 class Logger {
     private color = new Color()
 
-    private time(): string {
+    private datetime(): string {
         const now = new Date(Date.now())
 
         return this.color.gray(`${now.getFullYear()}-${now.getMonth()}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds() < 10 ? '0' + now.getSeconds() : now.getSeconds()}`)
+    }
+
+    private time(): string {
+        const now = new Date(Date.now())
+
+        return this.color.gray(`${now.getHours()}:${now.getMinutes()}:${now.getSeconds() < 10 ? '0' + now.getSeconds() : now.getSeconds()}.${now.getMilliseconds()}`)
     }
 
     info(...msgs: string[]) {
@@ -84,10 +90,11 @@ const ujOptions = {
 }
 
 function open(dir: string) {
-    let ls: ChildProcessWithoutNullStreams = null
+    logger.info("正在打开文件管理器...")
+    let cmd: ChildProcessWithoutNullStreams = null
     switch (type()) {
         case "Windows_NT":
-            ls = spawn('explorer', [dir])
+            cmd = spawn('explorer', [dir])
             break
         case "Darwin":
             break
@@ -97,12 +104,15 @@ function open(dir: string) {
                 const disk = dir.substring(0, 1).toUpperCase()
                 dir = dir.slice(1).replace(/\//g, "\\")
                 dir = disk + ":" + dir
-                ls = spawn("/mnt/c/Windows/explorer.exe", [dir])
+                cmd = spawn("/mnt/c/Windows/explorer.exe", [dir])
             } else {
                 const desktop = process.env.XDG_SESSION_DESKTOP
                 switch (desktop) {
                     case 'KDE':
-                        ls = exec(`nohup dolphin ${dir} --new-window > /dev/null 2>&1 &`)
+                        exec(`nohup dolphin ${dir} --new-window > /dev/null 2>&1 &`, (err) => {
+                            if (err) throw err
+                            logger.info("已在文件管器中打开编绎目录")
+                        })
                         break
                     default:
                         logger.warn(`未知的桌面：${desktop}`)
@@ -111,10 +121,13 @@ function open(dir: string) {
             }
             break
     }
-    if (ls) {
-        ls.on('error', e => {
-            ls.kill()
+    if (cmd) {
+        cmd.on('error', e => {
+            cmd.kill()
             logger.error(e)
+        })
+        cmd.stdout.on('data', data => {
+            console.log(data)
         })
     }
 }
@@ -249,6 +262,6 @@ fs.readdirSync(buildDir).forEach((filename, index) => {
 
 open(path.join(__dirname, distDir))
 
-process.on('exit', code => {
+process.on('exit', () => {
     logger.info("已完成")
 })
