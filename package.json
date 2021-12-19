@@ -1,5 +1,6 @@
 {
   "name": "echarts-typescript-template",
+  "version": "0.1.0",
   "license": "MIT",
   "scripts": {
     "build": "tsc build.ts --outDir . --resolveJsonModule && node build.js && rm build.js"

@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import * as http from 'http'
 import * as UglifyJS from 'uglify-js'
 import { type } from "os"
-import { spawn, ChildProcessWithoutNullStreams } from "child_process"
+import { spawn, ChildProcessWithoutNullStreams, exec } from "child_process"
 import { ExecException, execSync } from 'child_process'
 import { devDependencies } from './package.json'
 import { compilerOptions } from './tsconfig.json'
@@ -88,6 +88,7 @@ function open(dir: string) {
     switch (type()) {
         case "Windows_NT":
             ls = spawn('explorer', [dir])
+            break
         case "Darwin":
             break
         default:
@@ -98,7 +99,15 @@ function open(dir: string) {
                 dir = disk + ":" + dir
                 ls = spawn("/mnt/c/Windows/explorer.exe", [dir])
             } else {
-
+                const desktop = process.env.XDG_SESSION_DESKTOP
+                switch (desktop) {
+                    case 'KDE':
+                        ls = exec(`nohup dolphin ${dir} --new-window > /dev/null 2>&1 &`)
+                        break
+                    default:
+                        logger.warn(`未知的桌面：${desktop}`)
+                        break
+                }
             }
             break
     }
